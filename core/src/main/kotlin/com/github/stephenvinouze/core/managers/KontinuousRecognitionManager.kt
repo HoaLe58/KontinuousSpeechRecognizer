@@ -11,7 +11,6 @@ import android.speech.SpeechRecognizer
 import androidx.core.content.getSystemService
 import com.github.stephenvinouze.core.interfaces.RecognitionCallback
 import com.github.stephenvinouze.core.models.RecognitionStatus
-import java.util.*
 
 /**
  * Created by stephenvinouze on 16/05/2017.
@@ -31,7 +30,7 @@ class KontinuousRecognitionManager(
         Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
             putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
             putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, context.packageName)
-            putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale("vi", "VN"))
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE, "vi-VN")
             putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1)
         }
     }
