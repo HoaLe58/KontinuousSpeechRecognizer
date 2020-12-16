@@ -148,7 +148,6 @@ class KontinuousRecognitionManager(
                 matches.firstOrNull{it.contains(other = deactivationKeyword, ignoreCase = true)}
                         ?.let {
                             isActivated = false
-                            stopRecognition()
                         }
             } else {
                 matches.firstOrNull { it.contains(other = activationKeyword, ignoreCase = true) }
@@ -156,8 +155,8 @@ class KontinuousRecognitionManager(
                             isActivated = true
                             callback?.onKeywordDetected()
                         }
-                startRecognition()
             }
+            startRecognition()
         }
     }
 
