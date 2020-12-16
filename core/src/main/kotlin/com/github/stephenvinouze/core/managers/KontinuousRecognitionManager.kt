@@ -22,7 +22,6 @@ class KontinuousRecognitionManager(
         private val callback: RecognitionCallback? = null
 ) : RecognitionListener {
 
-    private var isActivated: Boolean = false
     private val speech: SpeechRecognizer by lazy { SpeechRecognizer.createSpeechRecognizer(context) }
     private val audioManager: AudioManager? = context.getSystemService()
 
@@ -86,7 +85,7 @@ class KontinuousRecognitionManager(
     }
 
     override fun onReadyForSpeech(params: Bundle) {
-        muteRecognition(shouldMute || !isActivated)
+        muteRecognition(shouldMute)
         callback?.onReadyForSpeech(params)
     }
 
@@ -103,10 +102,7 @@ class KontinuousRecognitionManager(
     }
 
     override fun onError(errorCode: Int) {
-        if (isActivated) {
-            callback?.onError(errorCode)
-        }
-        isActivated = false
+        callback?.onError(errorCode)
 
         when (errorCode) {
             SpeechRecognizer.ERROR_RECOGNIZER_BUSY -> cancelRecognition()
@@ -125,7 +121,7 @@ class KontinuousRecognitionManager(
 
     override fun onPartialResults(partialResults: Bundle) {
         val matches = partialResults.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
-        if (isActivated && matches != null) {
+        if (matches != null) {
             callback?.onPartialResults(matches)
         }
     }
@@ -134,18 +130,7 @@ class KontinuousRecognitionManager(
         val matches = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
         val scores = results.getFloatArray(SpeechRecognizer.CONFIDENCE_SCORES)
         if (matches != null) {
-            if (isActivated) {
-                isActivated = false
                 callback?.onResults(matches, scores)
-                stopRecognition()
-            } else {
-                matches.firstOrNull { it.contains(other = activationKeyword, ignoreCase = true) }
-                        ?.let {
-                            isActivated = true
-                            callback?.onKeywordDetected()
-                        }
-                startRecognition()
-            }
         }
     }
 
