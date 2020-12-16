@@ -116,7 +116,6 @@ class KontinuousRecognitionManager(
         if (isActivated) {
             callback?.onError(errorCode)
         }
-        isActivated = false
 
         when (errorCode) {
             SpeechRecognizer.ERROR_RECOGNIZER_BUSY -> cancelRecognition()
