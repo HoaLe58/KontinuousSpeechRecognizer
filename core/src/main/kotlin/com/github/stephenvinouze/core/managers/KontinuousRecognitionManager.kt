@@ -146,7 +146,7 @@ class KontinuousRecognitionManager(
         if (matches != null) {
             if (isActivated) {
                 callback?.onResults(matches, scores)
-                results.firstOrNull{it.contains(other = deactivationKeyword, ignoreCase = true)}
+                matches.firstOrNull{it.contains(other = deactivationKeyword, ignoreCase = true)}
                         ?.let {
                             isActivated = false
                             stopRecognition()
