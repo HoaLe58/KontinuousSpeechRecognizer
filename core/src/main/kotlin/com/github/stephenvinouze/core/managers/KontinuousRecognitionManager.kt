@@ -18,6 +18,7 @@ import com.github.stephenvinouze.core.models.RecognitionStatus
 class KontinuousRecognitionManager(
         private val context: Context,
         private val activationKeyword: String,
+        private val deactivationKeyword: String,
         private val shouldMute: Boolean = false,
         private val callback: RecognitionCallback? = null
 ) : RecognitionListener {
@@ -32,6 +33,15 @@ class KontinuousRecognitionManager(
             putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, context.packageName)
             putExtra(RecognizerIntent.EXTRA_LANGUAGE, "vi-VN")
             putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1)
+            putExtra(
+                RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS,
+                3000
+            )
+            putExtra(
+                RecognizerIntent.EXTRA_SPEECH_INPUT_MINIMUM_LENGTH_MILLIS,
+                5000
+            )
+            mSpeechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
         }
     }
 
@@ -135,9 +145,12 @@ class KontinuousRecognitionManager(
         val scores = results.getFloatArray(SpeechRecognizer.CONFIDENCE_SCORES)
         if (matches != null) {
             if (isActivated) {
-                isActivated = false
                 callback?.onResults(matches, scores)
-                stopRecognition()
+                results.firstOrNull{it.contains(other = deactivationKeyword, ignoreCase = true)}
+                        ?.let {
+                            isActivated = false
+                            stopRecognition()
+                        }
             } else {
                 matches.firstOrNull { it.contains(other = activationKeyword, ignoreCase = true) }
                         ?.let {
